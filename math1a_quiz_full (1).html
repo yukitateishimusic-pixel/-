@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>数学ⅠA 全単元クイズ</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #f7f6f2;
+      --surface: #ffffff;
+      --surface2: #f1efe8;
+      --border: rgba(0,0,0,0.12);
+      --border2: rgba(0,0,0,0.2);
+      --text: #1a1a18;
+      --text2: #5f5e5a;
+      --text3: #888780;
+      --green: #1D9E75;
+      --green-bg: #E1F5EE;
+      --green-dark: #085041;
+      --green-border: #9FE1CB;
+      --red-bg: #FCEBEB;
+      --red: #E24B4A;
+      --red-dark: #501313;
+      --red-border: #F7C1C1;
+      --blue-bg: #E6F1FB;
+      --blue: #185FA5;
+      --blue-dark: #042C53;
+      --blue-border: #B5D4F4;
+      --amber-bg: #FAEEDA;
+      --amber-dark: #412402;
+      --amber-border: #FAC775;
+      --purple-bg: #EEEDFE;
+      --purple: #534AB7;
+      --radius: 12px;
+      --radius-sm: 8px;
+    }
+    body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding: 2rem 1rem; }
+    .container { max-width: 680px; margin: 0 auto; }
+
+    /* トップ画面 */
+    .top-screen { display: block; }
+    .quiz-screen { display: none; }
+    h1 { font-size: 24px; font-weight: 700; margin-bottom: 4px; }
+    .top-subtitle { font-size: 14px; color: var(--text3); margin-bottom: 2rem; }
+    .section-title { font-size: 13px; font-weight: 500; color: var(--text2); margin-bottom: 10px; letter-spacing: 0.05em; }
+
+    /* 単元カード */
+    .unit-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; margin-bottom: 2rem; }
+    .unit-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem 1.25rem;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s;
+      text-align: left;
+      font-family: inherit;
+      width: 100%;
+    }
+    .unit-card:hover { background: var(--surface2); border-color: var(--border2); }
+    .unit-card .unit-icon { font-size: 22px; margin-bottom: 8px; display: block; }
+    .unit-card .unit-name { font-size: 14px; font-weight: 500; color: var(--text); margin-bottom: 2px; }
+    .unit-card .unit-count { font-size: 12px; color: var(--text3); }
+    .unit-card.selected { border: 2px solid var(--green); background: var(--green-bg); }
+    .unit-card.selected .unit-name { color: var(--green-dark); }
+
+    /* 全単元ボタン */
+    .all-btn {
+      width: 100%;
+      padding: 14px;
+      background: var(--text);
+      color: white;
+      border: none;
+      border-radius: var(--radius-sm);
+      font-size: 15px;
+      font-family: inherit;
+      cursor: pointer;
+      margin-bottom: 10px;
+      transition: opacity 0.15s;
+    }
+    .all-btn:hover { opacity: 0.85; }
+    .start-btn {
+      width: 100%;
+      padding: 14px;
+      background: var(--surface);
+      border: 1px solid var(--border2);
+      border-radius: var(--radius-sm);
+      font-size: 15px;
+      font-family: inherit;
+      cursor: pointer;
+      color: var(--text);
+      transition: background 0.15s;
+    }
+    .start-btn:hover { background: var(--surface2); }
+
+    /* クイズ画面 */
+    .quiz-header { display: flex; align-items: center; gap: 12px; margin-bottom: 1.25rem; }
+    .back-btn { background: none; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 6px 12px; font-size: 13px; cursor: pointer; color: var(--text2); font-family: inherit; }
+    .back-btn:hover { background: var(--surface2); }
+    .progress-wrap { flex: 1; height: 6px; background: var(--surface2); border-radius: 999px; overflow: hidden; }
+    .progress-bar { height: 100%; background: var(--green); border-radius: 999px; transition: width 0.4s ease; }
+    .counter { font-size: 12px; color: var(--text3); white-space: nowrap; }
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; margin-bottom: 1rem; }
+    .unit-label { font-size: 12px; color: var(--text3); margin-bottom: 8px; }
+    .question-text { font-size: 17px; font-weight: 500; line-height: 1.6; }
+    .choices { display: flex; flex-direction: column; gap: 10px; margin-bottom: 1rem; }
+    .choice-btn {
+      background: var(--surface); border: 1px solid var(--border2); border-radius: var(--radius-sm);
+      padding: 14px 16px; text-align: left; cursor: pointer; font-size: 15px; color: var(--text);
+      transition: background 0.15s; display: flex; align-items: center; gap: 10px;
+      font-family: inherit; width: 100%;
+    }
+    .choice-btn:hover:not(:disabled) { background: var(--surface2); }
+    .choice-btn:disabled { cursor: default; }
+    .choice-btn.correct { background: var(--green-bg); border-color: var(--green-border); color: var(--green-dark); }
+    .choice-btn.wrong { background: var(--red-bg); border-color: var(--red-border); color: var(--red-dark); }
+    .choice-label { font-size: 12px; font-weight: 500; width: 22px; height: 22px; border-radius: 50%; background: var(--surface2); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .correct .choice-label { background: var(--green); color: white; }
+    .wrong .choice-label { background: var(--red); color: white; }
+    .explanation { background: var(--blue-bg); border: 1px solid var(--blue-border); border-radius: var(--radius); padding: 1.25rem 1.5rem; margin-bottom: 1rem; animation: fadeIn 0.3s ease; }
+    .explanation-title { font-size: 13px; font-weight: 500; color: var(--blue); margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+    .explanation-text { font-size: 14px; color: var(--blue-dark); line-height: 1.7; }
+    .analogy { background: var(--amber-bg); border: 1px solid var(--amber-border); border-radius: var(--radius-sm); padding: 10px 14px; margin-top: 10px; font-size: 13px; color: var(--amber-dark); line-height: 1.6; }
+    .analogy-label { font-weight: 500; margin-bottom: 4px; }
+    .next-btn { width: 100%; padding: 14px; background: var(--surface); border: 1px solid var(--border2); border-radius: var(--radius-sm); font-size: 15px; cursor: pointer; color: var(--text); transition: background 0.15s; font-family: inherit; }
+    .next-btn:hover { background: var(--surface2); }
+    .score-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 2.5rem 2rem; text-align: center; }
+    .score-big { font-size: 52px; font-weight: 700; color: var(--text); line-height: 1; }
+    .score-sub { font-size: 14px; color: var(--text3); margin-top: 6px; margin-bottom: 1rem; }
+    .result-msg { font-size: 16px; color: var(--text2); margin-bottom: 1.5rem; }
+    .score-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+    .retry-btn { padding: 12px 28px; background: var(--surface2); border: 1px solid var(--border2); border-radius: var(--radius-sm); font-size: 14px; cursor: pointer; color: var(--text); font-family: inherit; transition: background 0.15s; }
+    .retry-btn:hover { background: var(--bg); }
+    .top-btn { padding: 12px 28px; background: var(--text); color: white; border: none; border-radius: var(--radius-sm); font-size: 14px; cursor: pointer; font-family: inherit; transition: opacity 0.15s; }
+    .top-btn:hover { opacity: 0.85; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+    @media (max-width: 480px) {
+      body { padding: 1rem 0.75rem; }
+      .unit-grid { grid-template-columns: repeat(2, 1fr); }
+      .question-text { font-size: 15px; }
+      .choice-btn { font-size: 14px; padding: 12px 14px; }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <!-- トップ画面 -->
+  <div class="top-screen" id="top-screen">
+    <h1>数学ⅠA クイズ</h1>
+    <p class="top-subtitle">単元を選んでチャレンジしよう！複数選択もできます</p>
+    <p class="section-title">数学Ⅰ</p>
+    <div class="unit-grid" id="unit-grid-1"></div>
+    <p class="section-title">数学A</p>
+    <div class="unit-grid" id="unit-grid-a"></div>
+    <button class="all-btn" onclick="startAll()">🎯 全単元ランダムに挑戦する</button>
+    <button class="start-btn" id="start-selected-btn" onclick="startSelected()" style="display:none">選んだ単元でスタート →</button>
+  </div>
+
+  <!-- クイズ画面 -->
+  <div class="quiz-screen" id="quiz-screen">
+    <div class="quiz-header">
+      <button class="back-btn" onclick="goTop()">← 単元選択</button>
+      <div class="progress-wrap"><div class="progress-bar" id="progress" style="width:0%"></div></div>
+      <div class="counter" id="counter">1 / 10</div>
+    </div>
+    <div id="quiz-area"></div>
+  </div>
+
+</div>
+<script>
+const UNITS_1 = [
+  { id: "数と式", icon: "🔢", label: "数学Ⅰ" },
+  { id: "二次関数", icon: "📈", label: "数学Ⅰ" },
+  { id: "二次方程式", icon: "✏️", label: "数学Ⅰ" },
+  { id: "三角比", icon: "📐", label: "数学Ⅰ" },
+  { id: "データの分析", icon: "📊", label: "数学Ⅰ" },
+];
+const UNITS_A = [
+  { id: "場合の数", icon: "🎲", label: "数学A" },
+  { id: "確率", icon: "🎯", label: "数学A" },
+  { id: "図形の性質", icon: "🔺", label: "数学A" },
+  { id: "整数の性質", icon: "🔑", label: "数学A" },
+];
+
+const ALL_QUESTIONS = {
+  "数と式": [
+    { q: "(a+b)² を展開すると？", choices: ["a²+2ab+b²","a²+b²","a²−2ab+b²","2a+2b"], answer: 0, explanation: "公式 (a+b)² = a²+2ab+b² です。\n真ん中の 2ab を忘れがちなので注意しましょう。", analogy: "📦 たとえ：辺の長さ(a+b)の正方形の面積を、4つのパーツに分けて考えると自然に導けます。" },
+    { q: "√12 を簡単にすると？", choices: ["2√3","3√2","4√3","√12のまま"], answer: 0, explanation: "12 = 4×3 なので √12 = √4 × √3 = 2√3 です。\nルートの中を素因数分解して、平方数を外に出します。", analogy: "🎁 たとえ：箱(ルート)の中から取り出せるもの(平方数)を外に出すイメージです。" },
+    { q: "a²−b² を因数分解すると？", choices: ["(a+b)(a−b)","(a−b)²","(a+b)²","因数分解できない"], answer: 0, explanation: "これは「和と差の積の公式」です。\na²−b² = (a+b)(a−b) と必ず因数分解できます。", analogy: "✂️ たとえ：a²とb²の「差」は、いつも(a+b)と(a-b)のペアに切り分けられます。" },
+    { q: "x²+5x+6 を因数分解すると？", choices: ["(x+2)(x+3)","(x+1)(x+6)","(x−2)(x−3)","(x+5)(x+1)"], answer: 0, explanation: "かけて6、足して5になる2数は 2と3 です。\nよって (x+2)(x+3) です。", analogy: "🔢 たとえ：「積が6、和が5」になる数の組み合わせを探すパズルです。" },
+    { q: "√2×√8 を計算すると？", choices: ["4","2√2","√16","8"], answer: 0, explanation: "√2×√8 = √(2×8) = √16 = 4 です。\nルート同士の掛け算は、中の数を掛けてからルートを取ります。", analogy: "🧮 たとえ：ルートをカバンに例えると、同じカバン同士の掛け算は中身を出して計算できます。" },
+  ],
+  "二次関数": [
+    { q: "y = x²+4x+3 の頂点は？", choices: ["(−2, −1)","(2, −1)","(−2, 1)","(0, 3)"], answer: 0, explanation: "y = (x+2)²−1 と平方完成します。\n頂点は (−2, −1) です。", analogy: "🏔️ たとえ：放物線の「てっぺん（または底）」が頂点。平方完成で山や谷の位置が分かります。" },
+    { q: "y = 2x²−8x+6 の軸は？", choices: ["x = 2","x = −2","x = 4","x = −4"], answer: 0, explanation: "y = 2(x−2)²−2 と平方完成します。\n軸は x = 2 です。", analogy: "🪞 たとえ：放物線は左右対称。その対称の中心線が「軸」です。" },
+    { q: "y = x²−6x+5 = 0 の解は？", choices: ["x=1, x=5","x=−1, x=−5","x=2, x=3","x=−2, x=3"], answer: 0, explanation: "因数分解して (x−1)(x−5)=0 なので x=1, x=5 です。", analogy: "📍 たとえ：放物線がx軸と交わる点のx座標が解です。グラフで確認するとイメージしやすいです。" },
+    { q: "放物線 y=x² を x軸方向に3、y軸方向に−2 平行移動すると？", choices: ["y=(x−3)²−2","y=(x+3)²−2","y=(x−3)²+2","y=x²+3−2"], answer: 0, explanation: "x軸方向に+3移動 → (x−3) に置き換え\ny軸方向に−2移動 → −2 を加える\ny = (x−3)²−2 となります。", analogy: "🚗 たとえ：グラフを車に例えると、右に3進めてから下に2下がった位置が新しい「頂点」になります。" },
+    { q: "二次関数 y=ax²+bx+c で a>0 のとき、グラフの形は？", choices: ["下に凸（U字型）","上に凸（∩字型）","直線","S字型"], answer: 0, explanation: "a>0 のとき、グラフは下に開いたU字型になります。\na<0 なら上に凸（∩字型）です。", analogy: "☂️ たとえ：a>0は晴れた日に開く傘（U字）、a<0は雨の日に開く傘（∩字）のイメージ。" },
+  ],
+  "二次方程式": [
+    { q: "x²−5x+6 = 0 を解くと？", choices: ["x=2, x=3","x=−2, x=−3","x=1, x=6","x=−1, x=−6"], answer: 0, explanation: "(x−2)(x−3) = 0 と因数分解できます。\nそれぞれ x=2, x=3 が答えです。", analogy: "🍕 たとえ：「2切れか3切れ食べたらピザがなくなった」。どちらかが正解なので両方が答えです。" },
+    { q: "x² = 9 を解くと？", choices: ["x=±3","x=3のみ","x=9","x=±9"], answer: 0, explanation: "x²=9 → x=±√9 = ±3\nプラスとマイナスの両方が答えです。", analogy: "🪞 たとえ：鏡のように+と−の両方が映ります。±を忘れずに！" },
+    { q: "解の公式で 2x²+3x−2=0 を解くと？", choices: ["x=1/2, x=−2","x=2, x=−1/2","x=−2, x=1","x=1, x=−3"], answer: 0, explanation: "x = (−3 ± √(9+16)) / 4 = (−3 ± 5) / 4\nx = 1/2 または x = −2 です。", analogy: "🧮 たとえ：解の公式は「数学の万能計算機」。因数分解できなくてもこれで必ず解けます！" },
+    { q: "判別式 D=b²−4ac で D=0 のとき？", choices: ["重解（解が1つ）","解が2つ","実数解なし","解が3つ"], answer: 0, explanation: "D=0 のとき、ルートの中がゼロになり解が1つ（重解）になります。", analogy: "👣 たとえ：同じ場所に二度足跡がついている状態。答えは一つだけど「二重」になっています。" },
+    { q: "x²+2x−8 = 0 を解くと？", choices: ["x=2, x=−4","x=−2, x=4","x=4, x=8","x=1, x=−8"], answer: 0, explanation: "(x+4)(x−2)=0 と因数分解できます。\nかけて−8、足して2になる数は +4 と −2 です。", analogy: "🎯 たとえ：積が−8（符号がマイナス）なら、片方がプラス・片方がマイナスのペアを探します。" },
+  ],
+  "三角比": [
+    { q: "sin 30° の値は？", choices: ["1/2","√2/2","√3/2","1"], answer: 0, explanation: "30°の三角比は sin30°=1/2、cos30°=√3/2、tan30°=1/√3 です。\n1:2:√3 の直角三角形から導けます。", analogy: "📏 たとえ：30-60-90の三角形を一つ覚えておけば、特別角の三角比はすぐ出せます！" },
+    { q: "cos 45° の値は？", choices: ["√2/2","1/2","√3/2","1"], answer: 0, explanation: "45°の直角二等辺三角形では辺の比が 1:1:√2 なので cos45°=1/√2=√2/2 です。", analogy: "🔄 たとえ：正方形を対角線で切ると45°の直角二等辺三角形。2辺が等しいから sin=cos になります。" },
+    { q: "sin²θ + cos²θ の値は？", choices: ["1","0","2","θによる"], answer: 0, explanation: "これは三角比の最重要公式：sin²θ + cos²θ = 1 です。\nどんなθでも必ず成り立ちます。", analogy: "⭕ たとえ：単位円（半径1の円）上の点(cosθ, sinθ)はどこでも x²+y²=1 を満たします。" },
+    { q: "tan 60° の値は？", choices: ["√3","1/√3","√2","1"], answer: 0, explanation: "tan=sin/cos なので tan60°=(√3/2)/(1/2)=√3 です。", analogy: "📐 たとえ：tanは「傾き」。60°の急な坂は√3という大きな傾きを持っています。" },
+    { q: "0°<θ<180° で sin θ = 1/2 のとき θ は？", choices: ["30° と 150°","30° のみ","60° と 120°","45° と 135°"], answer: 0, explanation: "sin30°=1/2 ですが、0°〜180°の範囲では sin(180°−30°)=sin150°=1/2 も成り立ちます。\nよって θ=30° と θ=150° の2つが答えです。", analogy: "🌈 たとえ：半円の上に弦を引くと、同じ高さで2か所交わります。その両方が答えになります。" },
+  ],
+  "データの分析": [
+    { q: "データ 2, 4, 6, 8, 10 の平均値は？", choices: ["6","5","7","8"], answer: 0, explanation: "(2+4+6+8+10)/5 = 30/5 = 6 です。\n平均は「全部足してデータの個数で割る」だけです。", analogy: "🍰 たとえ：ケーキを5人で均等に切り分けたときの1人分の大きさが「平均」です。" },
+    { q: "データ 1, 2, 3, 4, 100 の中央値（メジアン）は？", choices: ["3","22","100","4"], answer: 0, explanation: "データを小さい順に並べたとき、真ん中の値が中央値です。\n5個のデータなら3番目の値 = 3 です。", analogy: "🏃 たとえ：5人が一列に並んだとき、真ん中（3番目）の人の身長が「中央値」です。" },
+    { q: "分散の求め方として正しいのは？", choices: ["(各値−平均)²の平均","(各値−平均)の平均","各値の2乗の平均","最大値−最小値"], answer: 0, explanation: "分散 = 各データと平均の差の2乗の平均値です。\nばらつきを「マイナスにならないように」2乗して平均します。", analogy: "🎯 たとえ：的の中心（平均）からの距離（差）を2乗して平均したものが分散。散らばり具合の指標です。" },
+    { q: "標準偏差は分散との関係で？", choices: ["分散の正の平方根","分散の2倍","分散と同じ","分散の2乗"], answer: 0, explanation: "標準偏差 = √分散 です。\n2乗してあった「単位」を元に戻すために平方根を取ります。", analogy: "📏 たとえ：面積（分散）から長さ（標準偏差）を求めるために√を取るイメージです。" },
+    { q: "データ 3, 5, 7, 7, 8 の最頻値（モード）は？", choices: ["7","6","5","8"], answer: 0, explanation: "最頻値は最も多く出現する値です。\n7が2回出ているので最頻値は7です。", analogy: "👗 たとえ：服屋で一番売れているサイズが「最頻値」。一番人気の値です。" },
+  ],
+  "場合の数": [
+    { q: "5枚のカードから2枚選ぶ組合せは？", choices: ["10通り","20通り","5通り","15通り"], answer: 0, explanation: "C(5,2)=5!/(2!3!)=(5×4)/(2×1)=10通りです。\n順番は関係ない点がポイントです。", analogy: "👥 たとえ：5人から2人チームを組む方法。誰を選ぶかだけが大事です。" },
+    { q: "5人を一列に並べる方法は？", choices: ["120通り","25通り","10通り","60通り"], answer: 0, explanation: "5!=5×4×3×2×1=120通りです。\n1番目5通り、2番目4通り…と掛け合わせます。", analogy: "🎬 たとえ：5人の俳優を一列に並べるシーン。誰をどの位置にするかで全部違います。" },
+    { q: "4桁の暗証番号（0〜9、重複あり）は何通り？", choices: ["10000通り","5040通り","210通り","1000通り"], answer: 0, explanation: "各桁に10通りあり独立なので 10⁴=10000通りです。", analogy: "🔐 たとえ：スマホの暗証番号。0000〜9999まで10000個あります。" },
+    { q: "男3人女3人から男1女1の委員を選ぶ方法は？", choices: ["9通り","6通り","3通り","12通り"], answer: 0, explanation: "男3人から1人：3通り、女3人から1人：3通り\n3×3=9通りです。", analogy: "🤝 たとえ：男女それぞれのグループから代表を選ぶ。それぞれの選び方を掛け合わせます。" },
+    { q: "5人から3人を選ぶ組合せ C(5,3) は？", choices: ["10通り","60通り","20通り","15通り"], answer: 0, explanation: "C(5,3)=5!/(3!2!)=(5×4×3)/(3×2×1)=10通りです。\nC(5,3)=C(5,2) であることも覚えておきましょう。", analogy: "🗳️ たとえ：5候補から3人当選する投票。選ばれる3人の組み合わせが答えです。" },
+  ],
+  "確率": [
+    { q: "サイコロを1回投げて偶数が出る確率は？", choices: ["1/2","1/3","2/3","1/6"], answer: 0, explanation: "偶数の目は2,4,6の3つ。全体は6つ。\n確率=3/6=1/2です。", analogy: "🎲 たとえ：サイコロの目は6種類。そのうち偶数が半分なので確率も半分です。" },
+    { q: "コインを2回投げて2回とも表が出る確率は？", choices: ["1/4","1/2","3/4","1/8"], answer: 0, explanation: "1回目に表：1/2、2回目も表：1/2\n独立なので 1/2×1/2=1/4 です。", analogy: "🪙 たとえ：2回コインを投げるのは全く独立した出来事。掛け算して計算します。" },
+    { q: "52枚のトランプから1枚引いてハートのエースの確率は？", choices: ["1/52","1/13","1/4","4/52"], answer: 0, explanation: "ハートのエースは1枚。全体52枚。\n確率=1/52です。", analogy: "🃏 たとえ：52枚の中からピンポイント1枚を引く確率。分母は全体の枚数です。" },
+    { q: "袋に赤3白2が入っている。1枚引いて赤の確率は？", choices: ["3/5","2/5","3/2","1/2"], answer: 0, explanation: "赤3枚÷全体5枚=3/5です。\n確率=(求めたい事象の数)÷(全体の数)が基本です。", analogy: "🎪 たとえ：くじ引きで当たり（赤）を引く確率。全部のくじのうち当たりは何本？を考えます。" },
+    { q: "P(A∪B)=P(A)+P(B) が成り立つのはどんなとき？", choices: ["A と B が互いに排反","A と B が独立","A が B に含まれる","いつでも成り立つ"], answer: 0, explanation: "A∩B=∅（共通部分がない）のとき、AとBは「互いに排反」といいます。\nこのとき P(A∪B)=P(A)+P(B) が成り立ちます。", analogy: "🚦 たとえ：「赤信号か青信号か」は同時に起こらないので排反。両方の確率を足してOKです。" },
+  ],
+  "図形の性質": [
+    { q: "三角形の内角の和は？", choices: ["180°","360°","270°","90°"], answer: 0, explanation: "三角形の3つの角を足すと必ず180°になります。", analogy: "📐 たとえ：どんな形の三角形でも3つの角を合わせると一直線（180°）になります。" },
+    { q: "円に内接する四角形の対角の和は？", choices: ["180°","360°","90°","270°"], answer: 0, explanation: "円に内接する四角形の向かい合う角（対角）の和は必ず180°です。", analogy: "⭕ たとえ：向かい合う角はシーソーのように釣り合います。一方が大きくなると他方は小さくなります。" },
+    { q: "直径に対する円周角は？", choices: ["90°","180°","45°","60°"], answer: 0, explanation: "直径に対する円周角は必ず90°（直角）。これをタレスの定理といいます。", analogy: "📏 たとえ：直径を底辺にして円の上どこに点を置いても必ず直角三角形ができます。" },
+    { q: "三角形の外角は？", choices: ["他の2内角の和に等しい","3つの内角の和に等しい","隣の内角と等しい","常に90°"], answer: 0, explanation: "三角形の1つの外角は、それと隣り合わない2つの内角の和に等しいです。", analogy: "🔄 たとえ：外角は「遠い2つの角を合わせたもの」。隣の角とは足して180°（一直線）になります。" },
+    { q: "平行四辺形の対角線の性質は？", choices: ["互いに中点で交わる","長さが等しい","直角に交わる","交わらない"], answer: 0, explanation: "平行四辺形の2本の対角線は互いの中点で交わります（2等分します）。", analogy: "✂️ たとえ：平行四辺形の対角線はちょうど真ん中で交差。4つの三角形の中心点が「真ん中」になっています。" },
+  ],
+  "整数の性質": [
+    { q: "12と18の最大公約数（GCD）は？", choices: ["6","3","9","12"], answer: 0, explanation: "12=2²×3、18=2×3²\n共通因数で最小のものを取ると GCD=2×3=6 です。", analogy: "🤝 たとえ：12人と18人のグループを、同じ人数のチームに分けられる最大人数が「最大公約数」です。" },
+    { q: "4と6の最小公倍数（LCM）は？", choices: ["12","24","6","8"], answer: 0, explanation: "4=2²、6=2×3\nそれぞれの素因数の最大べきをとって LCM=2²×3=12 です。", analogy: "🚌 たとえ：4分おきと6分おきのバスが同時に来るのは何分後？→最小公倍数を使います！" },
+    { q: "整数 n を 3 で割ったとき余りが 2 なら、n を式で表すと？", choices: ["n=3k+2","n=3k−2","n=2k+3","n=3k"], answer: 0, explanation: "「3で割って余り2」は n=3k+2（kは整数）と表せます。\nk=0,1,2,…で n=2,5,8,… などになります。", analogy: "📅 たとえ：月曜=0,火曜=1,…と曜日を割り算の余りで表す考え方と同じです。" },
+    { q: "素数でないのはどれ？", choices: ["9","7","11","13"], answer: 0, explanation: "9=3×3 と分解できるので素数ではありません。\n素数は「1とその数自身しか約数を持たない2以上の整数」です。", analogy: "🧱 たとえ：素数は「これ以上分解できないブロック」。9はブロック3つに分解できるので素数ではありません。" },
+    { q: "ユークリッドの互除法で 48 と 18 の GCD を求めると？", choices: ["6","9","3","12"], answer: 0, explanation: "48÷18=2 余り12\n18÷12=1 余り6\n12÷6=2 余り0 → GCD=6 です。", analogy: "♻️ たとえ：大きい数を小さい数で割ってどんどん小さくしていく「縮小作戦」がユークリッドの互除法です。" },
+  ],
+};
+
+let selectedUnits = [];
+let questions = [];
+let current = 0;
+let score = 0;
+let answered = false;
+
+function renderTopScreen() {
+  function makeCards(units, gridId) {
+    const grid = document.getElementById(gridId);
+    grid.innerHTML = units.map(u => `
+      <button class="unit-card${selectedUnits.includes(u.id) ? ' selected' : ''}" onclick="toggleUnit('${u.id}')">
+        <span class="unit-icon">${u.icon}</span>
+        <div class="unit-name">${u.id}</div>
+        <div class="unit-count">${ALL_QUESTIONS[u.id].length}問</div>
+      </button>
+    `).join('');
+  }
+  makeCards(UNITS_1, 'unit-grid-1');
+  makeCards(UNITS_A, 'unit-grid-a');
+  document.getElementById('start-selected-btn').style.display = selectedUnits.length > 0 ? 'block' : 'none';
+}
+
+function toggleUnit(id) {
+  if (selectedUnits.includes(id)) {
+    selectedUnits = selectedUnits.filter(u => u !== id);
+  } else {
+    selectedUnits.push(id);
+  }
+  renderTopScreen();
+}
+
+function shuffle(arr) { return [...arr].sort(() => Math.random() - 0.5); }
+
+function startAll() {
+  let pool = [];
+  Object.values(ALL_QUESTIONS).forEach(qs => pool.push(...qs));
+  questions = shuffle(pool).slice(0, 10);
+  startQuiz();
+}
+
+function startSelected() {
+  if (selectedUnits.length === 0) return;
+  let pool = [];
+  selectedUnits.forEach(id => pool.push(...ALL_QUESTIONS[id]));
+  questions = shuffle(pool).slice(0, Math.min(10, pool.length));
+  startQuiz();
+}
+
+function startQuiz() {
+  current = 0; score = 0; answered = false;
+  document.getElementById('top-screen').style.display = 'none';
+  document.getElementById('quiz-screen').style.display = 'block';
+  renderQuestion();
+}
+
+function goTop() {
+  document.getElementById('top-screen').style.display = 'block';
+  document.getElementById('quiz-screen').style.display = 'none';
+  renderTopScreen();
+}
+
+function renderQuestion() {
+  updateProgress();
+  if (current >= questions.length) { renderScore(); return; }
+  const q = questions[current];
+  const unitName = Object.entries(ALL_QUESTIONS).find(([k,v]) => v.includes(q))?.[0] || '';
+  document.getElementById('quiz-area').innerHTML = `
+    <div class="card">
+      <div class="unit-label">数学ⅠA ・ ${unitName}</div>
+      <div class="question-text">${q.q}</div>
+    </div>
+    <div class="choices" id="choices">
+      ${q.choices.map((c,i) => `
+        <button class="choice-btn" id="choice-${i}" onclick="selectAnswer(${i})">
+          <span class="choice-label">${'①②③④'[i]}</span>
+          <span>${c}</span>
+        </button>`).join('')}
+    </div>
+    <div id="explanation-area"></div>
+    <div id="next-area"></div>
+  `;
+}
+
+function selectAnswer(idx) {
+  if (answered) return;
+  answered = true;
+  const q = questions[current];
+  document.querySelectorAll('.choice-btn').forEach(b => b.disabled = true);
+  document.getElementById('choice-'+idx).classList.add(idx === q.answer ? 'correct' : 'wrong');
+  document.getElementById('choice-'+q.answer).classList.add('correct');
+  if (idx === q.answer) score++;
+  document.getElementById('explanation-area').innerHTML = `
+    <div class="explanation">
+      <div class="explanation-title"><i class="ti ti-bulb"></i> 解説</div>
+      <div class="explanation-text">${q.explanation.replace(/\n/g,'<br>')}</div>
+      <div class="analogy"><div class="analogy-label">身近なたとえ</div>${q.analogy}</div>
+    </div>`;
+  const label = current < questions.length - 1 ? '次の問題へ →' : '結果を見る →';
+  document.getElementById('next-area').innerHTML = `<button class="next-btn" onclick="nextQuestion()">${label}</button>`;
+}
+
+function nextQuestion() { current++; answered = false; renderQuestion(); }
+
+function updateProgress() {
+  document.getElementById('progress').style.width = (current / questions.length * 100) + '%';
+  document.getElementById('counter').textContent = `${Math.min(current+1, questions.length)} / ${questions.length}`;
+}
+
+function renderScore() {
+  document.getElementById('progress').style.width = '100%';
+  document.getElementById('counter').textContent = '完了！';
+  const pct = Math.round(score / questions.length * 100);
+  const msg = score === questions.length ? '🎉 満点！完璧です！'
+    : pct >= 80 ? '👍 すごい！よくできました！'
+    : pct >= 60 ? '📚 あと少し！苦手な単元を復習しよう'
+    : '💪 もう一度チャレンジしてみよう！';
+  document.getElementById('quiz-area').innerHTML = `
+    <div class="score-card">
+      <div class="score-big">${score} / ${questions.length}</div>
+      <div class="score-sub">${pct}% 正解</div>
+      <div class="result-msg">${msg}</div>
+      <div class="score-actions">
+        <button class="retry-btn" onclick="startQuiz()">もう一度やる</button>
+        <button class="top-btn" onclick="goTop()">単元を選びなおす</button>
+      </div>
+    </div>`;
+}
+
+renderTopScreen();
+</script>
+</body>
+</html>
