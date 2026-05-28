@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>数学ⅠA 練習クイズ</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #f7f6f2;
+      --surface: #ffffff;
+      --surface2: #f1efe8;
+      --border: rgba(0,0,0,0.12);
+      --border2: rgba(0,0,0,0.2);
+      --text: #1a1a18;
+      --text2: #5f5e5a;
+      --text3: #888780;
+      --green: #1D9E75;
+      --green-bg: #E1F5EE;
+      --green-dark: #085041;
+      --green-border: #9FE1CB;
+      --red-bg: #FCEBEB;
+      --red: #E24B4A;
+      --red-dark: #501313;
+      --red-border: #F7C1C1;
+      --blue-bg: #E6F1FB;
+      --blue: #185FA5;
+      --blue-dark: #042C53;
+      --blue-border: #B5D4F4;
+      --amber-bg: #FAEEDA;
+      --amber-dark: #412402;
+      --amber-border: #FAC775;
+      --radius: 12px;
+      --radius-sm: 8px;
+    }
+
+    body {
+      font-family: 'Noto Sans JP', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 2rem 1rem;
+    }
+
+    .container {
+      max-width: 640px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 4px;
+      color: var(--text);
+    }
+
+    .subtitle {
+      font-size: 13px;
+      color: var(--text3);
+      margin-bottom: 1.5rem;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 1.25rem;
+      flex-wrap: wrap;
+    }
+
+    .tab {
+      font-size: 13px;
+      padding: 6px 14px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      cursor: pointer;
+      background: var(--surface);
+      color: var(--text2);
+      transition: background 0.15s;
+      font-family: inherit;
+    }
+
+    .tab.active {
+      background: var(--surface2);
+      color: var(--text);
+      border-color: var(--border2);
+      font-weight: 500;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 1.25rem;
+    }
+
+    .progress-wrap {
+      flex: 1;
+      height: 6px;
+      background: var(--surface2);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .progress-bar {
+      height: 100%;
+      background: var(--green);
+      border-radius: 999px;
+      transition: width 0.4s ease;
+    }
+
+    .counter {
+      font-size: 12px;
+      color: var(--text3);
+      white-space: nowrap;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .unit-label {
+      font-size: 12px;
+      color: var(--text3);
+      margin-bottom: 8px;
+    }
+
+    .question-text {
+      font-size: 17px;
+      font-weight: 500;
+      line-height: 1.6;
+    }
+
+    .choices {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 1rem;
+    }
+
+    .choice-btn {
+      background: var(--surface);
+      border: 1px solid var(--border2);
+      border-radius: var(--radius-sm);
+      padding: 14px 16px;
+      text-align: left;
+      cursor: pointer;
+      font-size: 15px;
+      color: var(--text);
+      transition: background 0.15s;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: inherit;
+      width: 100%;
+    }
+
+    .choice-btn:hover:not(:disabled) {
+      background: var(--surface2);
+    }
+
+    .choice-btn:disabled { cursor: default; }
+
+    .choice-btn.correct {
+      background: var(--green-bg);
+      border-color: var(--green-border);
+      color: var(--green-dark);
+    }
+
+    .choice-btn.wrong {
+      background: var(--red-bg);
+      border-color: var(--red-border);
+      color: var(--red-dark);
+    }
+
+    .choice-label {
+      font-size: 12px;
+      font-weight: 500;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--surface2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .correct .choice-label { background: var(--green); color: white; }
+    .wrong .choice-label { background: var(--red); color: white; }
+
+    .explanation {
+      background: var(--blue-bg);
+      border: 1px solid var(--blue-border);
+      border-radius: var(--radius);
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1rem;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .explanation-title {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--blue);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .explanation-text {
+      font-size: 14px;
+      color: var(--blue-dark);
+      line-height: 1.7;
+    }
+
+    .analogy {
+      background: var(--amber-bg);
+      border: 1px solid var(--amber-border);
+      border-radius: var(--radius-sm);
+      padding: 10px 14px;
+      margin-top: 10px;
+      font-size: 13px;
+      color: var(--amber-dark);
+      line-height: 1.6;
+    }
+
+    .analogy-label {
+      font-weight: 500;
+      margin-bottom: 4px;
+    }
+
+    .next-btn {
+      width: 100%;
+      padding: 14px;
+      background: var(--surface);
+      border: 1px solid var(--border2);
+      border-radius: var(--radius-sm);
+      font-size: 15px;
+      cursor: pointer;
+      color: var(--text);
+      transition: background 0.15s;
+      font-family: inherit;
+    }
+
+    .next-btn:hover { background: var(--surface2); }
+
+    .score-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 2.5rem 2rem;
+      text-align: center;
+    }
+
+    .score-big {
+      font-size: 52px;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1;
+    }
+
+    .score-sub {
+      font-size: 14px;
+      color: var(--text3);
+      margin-top: 6px;
+      margin-bottom: 1rem;
+    }
+
+    .result-msg {
+      font-size: 16px;
+      color: var(--text2);
+      margin-bottom: 1.5rem;
+    }
+
+    .retry-btn {
+      padding: 12px 32px;
+      background: var(--surface2);
+      border: 1px solid var(--border2);
+      border-radius: var(--radius-sm);
+      font-size: 15px;
+      cursor: pointer;
+      color: var(--text);
+      font-family: inherit;
+      transition: background 0.15s;
+    }
+
+    .retry-btn:hover { background: var(--bg); }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 480px) {
+      body { padding: 1rem 0.75rem; }
+      .question-text { font-size: 15px; }
+      .choice-btn { font-size: 14px; padding: 12px 14px; }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>数学ⅠA 練習クイズ</h1>
+  <p class="subtitle">単元を選んで、問題にチャレンジしよう！</p>
+  <div class="tabs" id="tabs"></div>
+  <div class="header">
+    <div class="progress-wrap"><div class="progress-bar" id="progress" style="width:0%"></div></div>
+    <div class="counter" id="counter">1 / 5</div>
+  </div>
+  <div id="quiz-area"></div>
+</div>
+
+<script>
+const ALL_QUESTIONS = {
+  "二次方程式": [
+    {
+      q: "x² − 5x + 6 = 0 を解くと？",
+      choices: ["x = 2, 3", "x = −2, −3", "x = 1, 6", "x = −1, −6"],
+      answer: 0,
+      explanation: "この式は (x−2)(x−3) = 0 と因数分解できます。\nそれぞれのかっこがゼロになるとき → x = 2 または x = 3 です。",
+      analogy: "🍕 たとえ話：「2切れか3切れ食べたらピザがなくなった」という状況。どちらかが正解なので、両方が答えになります。"
+    },
+    {
+      q: "x² = 9 を解くと？",
+      choices: ["x = 3", "x = ±3", "x = 9", "x = ±9"],
+      answer: 1,
+      explanation: "x² = 9 は「2乗して9になる数」を求めます。\n3² = 9 ですが、(−3)² = 9 でもあるので、x = 3 と x = −3 の両方が正解です。",
+      analogy: "🪞 たとえ話：鏡のように、プラスとマイナスの両方が映ります。忘れずに±をつけましょう。"
+    },
+    {
+      q: "x² + 2x + 1 = 0 を解くと？",
+      choices: ["x = −1 のみ", "x = 1 のみ", "x = ±1", "解なし"],
+      answer: 0,
+      explanation: "(x+1)² = 0 と因数分解できます。\n(x+1) = 0 なので x = −1 だけが答えです。これを「重解」といいます。",
+      analogy: "👣 たとえ話：同じ場所に二度足跡がついている状態。答えは一つだけど、二重になっている感じです。"
+    },
+    {
+      q: "解の公式を使って 2x² + 3x − 2 = 0 を解くと？",
+      choices: ["x = 1/2, −2", "x = 2, −1/2", "x = −2, 1", "x = 1, −3"],
+      answer: 0,
+      explanation: "解の公式 x = (−b ± √(b²−4ac)) / 2a に a=2, b=3, c=−2 を代入します。\n判別式：3²−4×2×(−2) = 9+16 = 25\n√25 = 5 なので x = (−3+5)/4 = 1/2、または x = (−3−5)/4 = −2",
+      analogy: "🧮 たとえ話：解の公式は「数学の万能計算機」。因数分解できなくてもこれがあれば必ず解けます！"
+    },
+    {
+      q: "判別式 D = b²−4ac で、D < 0 のとき、実数解は何個？",
+      choices: ["0個（実数解なし）", "1個（重解）", "2個", "3個"],
+      answer: 0,
+      explanation: "D（判別式）はルートの中身。\nD < 0 → ルートの中がマイナス → 実数では解けない → 実数解は0個です。",
+      analogy: "🌊 たとえ話：砂漠に水が「マイナス」にあるようなもの。現実には存在しない状態です。"
+    }
+  ],
+  "場合の数": [
+    {
+      q: "1〜5の5枚のカードから2枚を選ぶ組合せの数は？",
+      choices: ["10通り", "20通り", "5通り", "15通り"],
+      answer: 0,
+      explanation: "組合せ C(5,2) = 5! / (2! × 3!) = (5×4) / (2×1) = 10通りです。\n順番は関係ない（{1,2}と{2,1}は同じ）点がポイントです。",
+      analogy: "👥 たとえ話：5人の中から2人でチームを組む方法。誰を選ぶかだけが大事で、順番は関係ありません。"
+    },
+    {
+      q: "5人を一列に並べる並べ方は？",
+      choices: ["120通り", "25通り", "10通り", "60通り"],
+      answer: 0,
+      explanation: "5人を1列に並べるのは 5! = 5×4×3×2×1 = 120通りです。\n1番目の選び方が5通り、2番目が4通り…と順番に掛けていきます。",
+      analogy: "🎬 たとえ話：5人の俳優を映画のシーンで一列に並べる方法。誰をどの位置にするかで全部違う映像になります。"
+    },
+    {
+      q: "大小2つのサイコロを投げるとき、出目の和が7になる確率は？",
+      choices: ["1/6", "7/36", "1/12", "5/36"],
+      answer: 0,
+      explanation: "全体の場合の数は 6×6 = 36通り。\n和が7になる組合せ：(1,6)(2,5)(3,4)(4,3)(5,2)(6,1) = 6通り。\n確率 = 6/36 = 1/6 です。",
+      analogy: "🎲 たとえ話：和が7になる組合せを全部書き出すのが一番確実。サイコロは全部で36マスの表に整理すると分かりやすいです。"
+    },
+    {
+      q: "A, B, C, D, Eの5人の中から委員長1人と副委員長1人を選ぶ方法は何通り？",
+      choices: ["20通り", "10通り", "5通り", "25通り"],
+      answer: 0,
+      explanation: "順番がある選び方（順列）なので P(5,2) = 5×4 = 20通り。\n委員長と副委員長は別の役職なので、AとBを選ぶ場合でも「A委員長・B副委員長」と「B委員長・A副委員長」は別物です。",
+      analogy: "🏆 たとえ話：1位と2位は全然違う！金メダルと銀メダルを別々に決めるイメージです。"
+    },
+    {
+      q: "4桁の暗証番号（0〜9の数字、重複あり）は全部で何通り？",
+      choices: ["10000通り", "5040通り", "210通り", "9999通り"],
+      answer: 0,
+      explanation: "各桁に0〜9の10通りがあり、重複ありで独立に選べるので\n10 × 10 × 10 × 10 = 10⁴ = 10000通りです。",
+      analogy: "🔐 たとえ話：スマホの暗証番号。「0000」から「9999」まで全部で10000個あります。"
+    }
+  ],
+  "図形の性質": [
+    {
+      q: "三角形の内角の和は？",
+      choices: ["180°", "360°", "270°", "90°"],
+      answer: 0,
+      explanation: "三角形の3つの角を足すと必ず180°になります。\nこれは三角形の基本中の基本のルールです。",
+      analogy: "📐 たとえ話：三角形をどんなに変な形にしても、3つの角を合わせると必ずまっすぐ一直線（180°）になります。"
+    },
+    {
+      q: "円に内接する四角形の向かい合う角の和は？",
+      choices: ["180°", "360°", "90°", "270°"],
+      answer: 0,
+      explanation: "円に内接する四角形では、向かい合う角（対角）の和は必ず180°です。\nこれを「対角の補角の定理」といいます。",
+      analogy: "⭕ たとえ話：円の上にのった四角形は、向かい合う角がシーソーのように釣り合っています。一方が大きくなると、もう一方は小さくなります。"
+    },
+    {
+      q: "直径に対する円周角は何度？",
+      choices: ["90°", "180°", "45°", "60°"],
+      answer: 0,
+      explanation: "直径に対する円周角は必ず90°（直角）になります。\nこれを「タレスの定理」といいます。",
+      analogy: "📏 たとえ話：直径を底辺にして円の上にどこでも点を置いても、必ず直角三角形ができます。魔法みたいですよね！"
+    },
+    {
+      q: "正三角形の内角の大きさは？",
+      choices: ["60°", "90°", "45°", "120°"],
+      answer: 0,
+      explanation: "正三角形は3つの角がすべて等しく、その和が180°なので\n180° ÷ 3 = 60° です。",
+      analogy: "🔺 たとえ話：ピザを3等分にカットしたときの切れ目の角度がまさに60°。とても均等な形です。"
+    },
+    {
+      q: "平行四辺形の対角線の性質として正しいのは？",
+      choices: ["互いに中点で交わる", "長さが等しい", "直角に交わる", "どれも正しくない"],
+      answer: 0,
+      explanation: "平行四辺形の2本の対角線は、互いの中点で交わります。\nつまり、それぞれの対角線が真ん中で2等分されます。",
+      analogy: "✂️ たとえ話：平行四辺形のちょうど中心で対角線が交差し、4つの三角形ができます。その中心点がお互いの「真ん中」になっています。"
+    }
+  ]
+};
+
+const UNITS = Object.keys(ALL_QUESTIONS);
+let currentUnit = UNITS[0];
+let questions = [];
+let current = 0;
+let score = 0;
+let answered = false;
+
+function shuffle(arr) {
+  return [...arr].sort(() => Math.random() - 0.5);
+}
+
+function initQuiz() {
+  questions = shuffle(ALL_QUESTIONS[currentUnit]).slice(0, 5);
+  current = 0;
+  score = 0;
+  answered = false;
+  renderQuestion();
+}
+
+function renderTabs() {
+  document.getElementById('tabs').innerHTML = UNITS.map(u =>
+    `<button class="tab${u === currentUnit ? ' active' : ''}" onclick="switchUnit('${u}')">${u}</button>`
+  ).join('');
+}
+
+function switchUnit(unit) {
+  currentUnit = unit;
+  renderTabs();
+  initQuiz();
+}
+
+function renderQuestion() {
+  updateProgress();
+  if (current >= questions.length) { renderScore(); return; }
+  const q = questions[current];
+  document.getElementById('quiz-area').innerHTML = `
+    <div class="card">
+      <div class="unit-label">数学ⅠA ・ ${currentUnit}</div>
+      <div class="question-text">${q.q}</div>
+    </div>
+    <div class="choices" id="choices">
+      ${q.choices.map((c, i) =>
+        `<button class="choice-btn" id="choice-${i}" onclick="selectAnswer(${i})">
+          <span class="choice-label">${'①②③④'[i]}</span>
+          <span>${c}</span>
+        </button>`
+      ).join('')}
+    </div>
+    <div id="explanation-area"></div>
+    <div id="next-area"></div>
+  `;
+}
+
+function selectAnswer(idx) {
+  if (answered) return;
+  answered = true;
+  const q = questions[current];
+  const btns = document.querySelectorAll('.choice-btn');
+  btns.forEach(b => b.disabled = true);
+  btns[idx].classList.add(idx === q.answer ? 'correct' : 'wrong');
+  btns[q.answer].classList.add('correct');
+  if (idx === q.answer) score++;
+
+  document.getElementById('explanation-area').innerHTML = `
+    <div class="explanation">
+      <div class="explanation-title"><i class="ti ti-bulb"></i> 解説</div>
+      <div class="explanation-text">${q.explanation.replace(/\n/g, '<br>')}</div>
+      <div class="analogy"><div class="analogy-label">身近なたとえ</div>${q.analogy}</div>
+    </div>
+  `;
+
+  const label = current < questions.length - 1 ? '次の問題へ →' : '結果を見る →';
+  document.getElementById('next-area').innerHTML =
+    `<button class="next-btn" onclick="nextQuestion()">${label}</button>`;
+}
+
+function nextQuestion() {
+  current++;
+  answered = false;
+  renderQuestion();
+}
+
+function updateProgress() {
+  document.getElementById('progress').style.width = (current / questions.length * 100) + '%';
+  document.getElementById('counter').textContent = `${Math.min(current + 1, questions.length)} / ${questions.length}`;
+}
+
+function renderScore() {
+  document.getElementById('progress').style.width = '100%';
+  document.getElementById('counter').textContent = '完了！';
+  const pct = Math.round(score / questions.length * 100);
+  const msg = score === questions.length ? '🎉 満点！すごい！'
+    : score >= 3 ? '👍 よくできました！'
+    : '📚 もう一度チャレンジしてみよう';
+  document.getElementById('quiz-area').innerHTML = `
+    <div class="score-card">
+      <div class="score-big">${score} / ${questions.length}</div>
+      <div class="score-sub">${pct}% 正解 ・ ${currentUnit}</div>
+      <div class="result-msg">${msg}</div>
+      <button class="retry-btn" onclick="initQuiz()">もう一度やる</button>
+    </div>
+  `;
+}
+
+renderTabs();
+initQuiz();
+</script>
+</body>
+</html>
